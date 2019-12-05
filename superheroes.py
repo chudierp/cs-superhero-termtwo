@@ -56,25 +56,22 @@ class Hero:
         '''
 
         total_damage = 0
-        # loop through all of our hero's abilities
         for ability in self.abilities:
-            # add the damage of each attack to our running total
             total_damage += ability.attack()
-        # return the total damage
+        
         return total_damage
 
     def add_armor(self, armor):
         '''Add armor to self.armors
             Armor: Armor Object
         '''
-        # TODO: Add armor object that is passed in to `self.armors`
         self.armors.append(armor)
 
     def defend(self, damage):
         '''Calculate the total block amount from all armor blocks.
             return: total_block:Int
         '''
-        # TODO: This method should run the block method on each armor in self.armors           
+                   
         total_block = 0
         for armor in self.armors:
             total_block += armor.block()
@@ -85,17 +82,14 @@ class Hero:
     def take_damage(self, damage):
         '''Updates self.current_health to reflect the damage minus the defense.
         '''
-        # TODO: Create a method that updates self.current_health to the current
-        # minus the the amount returned from calling self.defend(damage).
+        
         defense = self.defend(damage)    
         self.current_health -= damage - defense
 
     def is_alive(self):  
         '''Return True or False depending on whether the hero is alive or not.
         '''
-        # TODO: Check the current_health of the hero.
-        # if it is <= 0, then return False. Otherwise, they still have health
-        # and are therefore alive, so return True
+       
         if self.current_health <= 0:
             return False
         else:
@@ -112,12 +106,29 @@ class Hero:
         # 3) After each attack, check if either the hero (self) or the opponent is alive
         # 4) if one of them has died, print "HeroName won!" replacing HeroName with the name of the hero, and end the fight loop
         if len(self.abilities) == 0 and len(opponent.abilities) == 0:
-            print("Draw")       
+            print("Draw")
+        else:
+            while self.is_alive() == True and opponent.is_alive() == True:
+                opponent.take_damage(self.attack())
+                self.take_damage(opponent.attack())
+            
+            if self.current_health > opponent.current_health:
+                print("Winner:", self.name)
+            else:
+                print("Winner:", opponent.name)
+
+
 
 
 if __name__ == "__main__":
-    hero = Hero("Grace Hopper", 200)
-    hero.take_damage(150)
-    print(hero.is_alive())
-    hero.take_damage(15000)
-    print(hero.is_alive())
+    hero1 = Hero("Wonder Woman")
+    hero2 = Hero("Dumbledore")
+    ability1 = Ability("Super Speed", 300)
+    ability2 = Ability("Super Eyes", 130)
+    ability3 = Ability("Wizard Wand", 80)
+    ability4 = Ability("Wizard Beard", 20)
+    hero1.add_ability(ability1)
+    hero1.add_ability(ability2)
+    hero2.add_ability(ability3)
+    hero2.add_ability(ability4)
+    hero1.fight(hero2)
