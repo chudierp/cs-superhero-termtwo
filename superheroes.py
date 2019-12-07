@@ -199,14 +199,176 @@ class Team:
             opponent = random.choice(living_opponents)
             
             return hero.fight(opponent)
+
+class Arena:
+    def __init__(self):
+        '''Instantiate properties
+            team_one: None
+            team_two: None
+        ''' 
+
+        self.team_one = list()
+        self.team_two = list()         
     
-            
+    def create_ability(self):
+        '''Prompt for Ability information.
+            return Ability with values from user Input
+        '''
+        name = input("What is the ability name?  ")
+        max_damage = input(
+            "What is the max damage of the ability?  ")
+
+        return Ability(name, max_damage)
+
+    def create_weapon(self):
+        '''Prompt user for Weapon information
+            return Weapon with values from user input.
+        '''
+
+        weapon = input(
+            "create a new weapon object")
+        max_damage = input(
+            "What is the max damage of the weapon?  ")
+        return Weapon(weapon, max_damage)
+
+    def create_armor(self):
+        '''Prompt user for Armor information
+          return Armor with values from user input.
+        '''
+        # TODO:This method will allow a user to create a piece of armor.
+        #  Prompt the user for the necessary information to create a new armor object.
+        #  return the new armor object with values set by user.
+        new_armor = input(
+            "create a new armor object")
+        max_block = input(
+            "What is the max block of the armor?")
+        return Armor(new_armor,max_block)
+
+    def create_hero(self):
+        '''Prompt user for Hero information
+          return Hero with values from user input.
+        '''
+        hero_name = input("Hero's name: ")
+        hero = Hero(hero_name)
+        add_item = None
+        while add_item != "4":
+           add_item = input("[1] Add ability\n[2] Add weapon\n[3] Add armor\n[4] Done adding items\n\nYour choice: ")
+           if add_item == "1":
+               ability = self.create_ability()
+               hero.add_ability(ability)
+           elif add_item == "2":
+               weapon = self.create_weapon()
+               hero.add_weapon(weapon)
+           elif add_item == "3":
+               armor = self.create_armor()
+               hero.add_armor(armor)
+        return hero
+
+    def build_team_one(self):
+        name = input("\nWhat is the name of Team 1? ")
+        self.team_one_size = input("How many heros do you want on your first team?  ")
+        self.team_one = Team(name)
+        for _ in range(int(self.team_one_size)):
+            hero = self.create_hero()
+            self.team_one.add_hero(hero)
+
+    def build_team_two(self):
+        name = input("\nWhat is the name of Team 2? ")
+        self.team_two_size = input("How many heros do you want on your second team?  ")
+        self.team_two = Team(name)
+        for _ in range(int(self.team_two_size)):
+            hero = self.create_hero()
+            self.team_two.add_hero(hero)
+
+    def team_battle(self):
+        '''Battle team_one and team_two together.'''
+
+        self.team_one.attack(self.team_two)
+
+    def show_stats(self):
+        '''Prints team statistics to terminal.'''
+        # TODO: This method should print out battle statistics
+        # including each team's average kill/death ratio.
+        # Required Stats:
+        #     Show surviving heroes.
+        #     Declare winning team
+        #     Show both teams average kill/death ratio.
+
+        self.team_one.stats()
+        self.team_two.stats()
+
+        teamone_alive = 0
+        teamtwo_alive = 0
+        # Some help on how to achieve these tasks:
+        # TODO: for each team, loop through all of their heroes,
+        # and use the is_alive() method to check for alive heroes,
+        # printing their names and increasing the count if they're alive.
+        print(f"Team {self.team_one.name} alive heros: ")
+        for hero in self.team_one:
+            if hero.is_alive():
+                print(hero.name)
+                teamone_alive += 1
+
+        print(f"Team {self.team_two.name} alive heros: ")
+        for hero in self.team_two:
+            if hero.is_alive():
+                print(hero.name)
+                teamtwo_alive += 1       
+        # TODO: based off of your count of alive heroes,
+        # you can see which team has more alive heroes, and therefore,
+        # declare which team is the winning team
+        if teamone_alive > teamtwo_alive:
+            print(f"Team {self.team_one.name} has Won!")
+        else:
+            print(f"Team {self.team_two.name} has Won!")
         
+        # TODO for each team, calculate the total kills and deaths for each hero,
+        # find the average kills and deaths by dividing the totals by the number of heroes.
+        # finally, divide the average number of kills by the average number of deaths for each team
+        teamone_total_kills = 0
+        teamtwo_total_kills = 0
+        teamone_total_deaths = 0
+        teamtwo_total_deaths = 0
 
+        for hero in self.team_one:
+            teamone_total_kills += hero.kills
+            teamone_total_deaths += hero.deaths
 
+        for hero in self.team_two:
+            teamtwo_total_kills += hero.kills
+            teamtwo_total_deaths += hero.deaths
+
+        teamone_avg_kills = teamone_total_kills/self.team_one_size
+        teamtwo_avg_kills = teamtwo_total_kills/self.team_two_size
+        team_one = teamone_total_kills/teamone_total_deaths
+        team_two = teamtwo_total_kills/teamtwo_total_deaths
+
+        print(f"Team {self.team_one.name} avergae kills is {teamone_avg_kills}".format())
+        print(f"Team {self.team_one.name} kill/death ratio is {team_one}".format())
+        print(f"Team {self.team_two.name} avergae kills is {teamtwo_avg_kills}".format())
+        print(f"Team {self.team_two.name} kill/death ratio is {team_two}".format())
+    
 
 if __name__ == "__main__":
-    hero = Hero("Wonder Woman")
-    weapon = Weapon("Lasso of Truth", 90)
-    hero.add_weapon(weapon)
-    print(hero.attack())
+    game_is_running = True
+    # Instantiate Game Arena
+    arena = Arena()
+
+    #Build Teams
+    arena.build_team_one()
+    arena.build_team_two()
+
+    while game_is_running:
+
+        arena.team_battle()
+        # arena.show_stats()
+        play_again = input("Play Again? Y or N: ")
+
+        #Check for Player Input
+        if play_again.lower() == "n":
+            game_is_running = False
+
+        else:
+            #Revive heroes to play again
+            arena.team_one.revive_heroes()
+            arena.team_two.revive_heroes()
